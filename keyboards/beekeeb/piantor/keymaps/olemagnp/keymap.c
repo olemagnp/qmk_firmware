@@ -8,6 +8,7 @@
 #define MO_FUN MO(_FUN)
 #define SPC_NSYM LT(_NUM_SYM, KC_SPC)
 #define ENT_NSYM LT(_NUM_SYM, KC_ENT)
+#define BSP_MODS LT(_MODS, KC_BSPC)
 
 #define OSM_GUI OSM(MOD_LGUI)
 #define OSM_SFT OSM(MOD_LSFT)
@@ -24,6 +25,7 @@ enum layers {
     _NUM_SYM,
     _NAV,
     _FUN,
+    _MODS,
 };
 
 const key_override_t slash_override = ko_make_basic(MOD_MASK_SHIFT, NO_SLSH, NO_BSLS);
@@ -34,6 +36,7 @@ const key_override_t **key_overrides = (const key_override_t *[]) {
     &quot_override,
     NULL
 };
+
 
 bool is_alt_tab_active = false;
 enum custom_keycodes {
@@ -83,10 +86,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       *                       └───┘   └───┘
       */
     [_COLEMAK] = LAYOUT_split_3x6_3(
-         KC_ESC,   KC_Q,    KC_W,    KC_F,    KC_P,    KC_B,                          KC_J,    KC_L,    KC_U,    KC_Y,  NO_DQUO, NO_AE,
+         KC_ESC,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_B,                          KC_J,    KC_L,    KC_U,    KC_Y,  NO_DQUO, NO_AE,
          KC_TAB,  KC_A,    KC_R,    KC_S,    KC_T,    KC_G,                          KC_M,    KC_N,    KC_E,    KC_I,     KC_O, NO_OSTR,
         KC_LSFT,  KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,                          KC_K,    KC_H, NO_COMM,  NO_DOT,  NO_SLSH, NO_ARNG,
-                                            MO_NAV, SPC_NSYM, KC_BSPC,       OSM_SFT, ENT_NSYM, MO_FUN
+                                            MO_NAV, SPC_NSYM, OSM_SFT,       OSM_SFT, ENT_NSYM, MO_FUN
     ),
 
     [_NUM_SYM] = LAYOUT_split_3x6_3(
@@ -109,4 +112,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, _______, _______, KC_FIND,  QK_REP, _______,                        _______, KC_F1, KC_F2, KC_F3, KC_F10, _______,
                                             _______, _______, _______,      _______, _______, _______
     ),
+
+    [_MODS] = LAYOUT_split_3x6(
+        _______, _______, _______, _______, _______, _______,                        _______, _______, _______, _______, _______, _______,
+        _______, OSM_CTL, OSM_ALT, OSM_GUI, OSM_SFT, _______,                        _______, OSM_SFT, OSM_GUI, OSM_ALT, OSM_CTL, _______,
+        _______, _______, _______, _______, _______, _______,                        _______, _______, _______, _______, _______, _______,
+                                            _______, _______, _______,      _______, _______, _______
+    )
 };
