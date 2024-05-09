@@ -89,7 +89,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
          KC_ESC,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_B,                          KC_J,    KC_L,    KC_U,    KC_Y,  NO_DQUO, NO_AE,
          KC_TAB,  KC_A,    KC_R,    KC_S,    KC_T,    KC_G,                          KC_M,    KC_N,    KC_E,    KC_I,     KC_O, NO_OSTR,
         KC_LSFT,  KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,                          KC_K,    KC_H, NO_COMM,  NO_DOT,  NO_SLSH, NO_ARNG,
-                                            MO_NAV, SPC_NSYM, OSM_SFT,       OSM_SFT, ENT_NSYM, MO_FUN
+                                            MO_NAV, SPC_NSYM, BSP_MODS,       OSM_SFT, ENT_NSYM, MO_FUN
     ),
 
     [_NUM_SYM] = LAYOUT_split_3x6_3(
@@ -107,16 +107,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     [_FUN] = LAYOUT_split_3x6_3(
-        ALT_TAB, _______, _______, _______, _______, _______,                        _______, KC_F7, KC_F8, KC_F9, KC_F12, _______,
+        ALT_TAB, KC_BSPC, _______, _______, _______, _______,                        _______, KC_F7, KC_F8, KC_F9, KC_F12, _______,
         _______, KC_UNDO,  KC_CUT, KC_COPY, KC_PSTE, _______,                        _______, KC_F4, KC_F5, KC_F6, KC_F11, _______,
         _______, _______, _______, KC_FIND,  QK_REP, _______,                        _______, KC_F1, KC_F2, KC_F3, KC_F10, _______,
                                             _______, _______, _______,      _______, _______, _______
     ),
 
-    [_MODS] = LAYOUT_split_3x6(
+    [_MODS] = LAYOUT_split_3x6_3(
         _______, _______, _______, _______, _______, _______,                        _______, _______, _______, _______, _______, _______,
         _______, OSM_CTL, OSM_ALT, OSM_GUI, OSM_SFT, _______,                        _______, OSM_SFT, OSM_GUI, OSM_ALT, OSM_CTL, _______,
         _______, _______, _______, _______, _______, _______,                        _______, _______, _______, _______, _______, _______,
                                             _______, _______, _______,      _______, _______, _______
-    )
+    ),
 };
