@@ -4,6 +4,9 @@
 #include QMK_KEYBOARD_H
 #include "keymap_norwegian.h"
 
+#define QW_MODE DF(_QWERTY)
+#define CO_MODE DF(_COLEMAK)
+
 #define MO_NAV MO(_NAV)
 #define MO_FUN MO(_FUN)
 #define SPC_NSYM LT(_NUM_SYM, KC_SPC)
@@ -20,8 +23,22 @@
 #define KC_CUT LCTL(KC_X)
 #define KC_UNDO LCTL(KC_Z)
 
+typedef union {
+    uint32_t raw;
+    struct {
+        bool mac_mode :1;
+    };
+} user_config_t;
+user_config_t user_config;
+
+void keyboard_post_init_user(void) {
+    // Read user config from EEPROM
+    user_config.raw = eeconfig_read_user();
+}
+
 enum layers {
     _COLEMAK,
+    _QWERTY,
     _NUM_SYM,
     _NAV,
     _FUN,
@@ -37,15 +54,24 @@ const key_override_t **key_overrides = (const key_override_t *[]) {
     NULL
 };
 
-
 bool is_alt_tab_active = false;
 enum custom_keycodes {
     ALT_TAB = SAFE_RANGE,
+    MAC_MODE,
+};
+
+const uint16_t PROGMEM qwerty_combo[] = {KC_ESC, KC_TAB, KC_LSFT, KC_Q, COMBO_END};
+const uint16_t PROGMEM colemak_combo[] = {KC_ESC, KC_TAB, KC_LSFT, KC_C, COMBO_END};
+const uint16_t PROGMEM mac_combo[] = {KC_ESC, KC_TAB, KC_LSFT, KC_M, COMBO_END};
+combo_t key_combos[] = {
+    COMBO(qwerty_combo, QW_MODE),
+    COMBO(colemak_combo, CO_MODE),
+    COMBO(mac_combo, MAC_MODE),
 };
 
 layer_state_t layer_state_set_user(layer_state_t state) {
     if (is_alt_tab_active) {
-        unregister_code(KC_LALT);
+        unregister_code(user_config.mac_mode ? KC_LGUI : KC_LALT);
         is_alt_tab_active = false;
     }
     return state;
@@ -57,13 +83,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (record->event.pressed) {
                 if (!is_alt_tab_active) {
                     is_alt_tab_active = true;
-                    register_code(KC_LALT);
+                    register_code(user_config.mac_mode ? KC_LGUI : KC_LALT);
                 }
                 register_code(KC_TAB);
             } else {
                 unregister_code(KC_TAB);
             }
             break;
+        case MAC_MODE:
+            if (record->event.pressed) {
+                user_config.mac_mode ^= 1;
+                eeconfig_update_user(user_config.raw);
+            }
         return false;
     }
     return true;
@@ -71,24 +102,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 // Using CAGS-home-row-mods
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-     /*
-      * ┌───┬───┬───┬───┬───┬───┐       ┌───┬───┬───┬───┬───┬───┐
-      * │Tab│ Q │ W │ F │ P │ B │       │ J │ L │ U │ Y │ ' │ Æ │
-      * ├───┼───┼───┼───┼───┼───┤       ├───┼───┼───┼───┼───┼───┤
-      * │Ctl│ A │ R │ S │ T │ G │       │ M │ N │ E │ I │ O │ Ø │
-      * ├───┼───┼───┼───┼───┼───┤       ├───┼───┼───┼───┼───┼───┤
-      * │Sft│ Z │ X │ C │ D │ V │       │ K │ H │ , │ . │ / │ Å │
-      * └───┴───┴───┴───┴───┴───┘       └───┴───┴───┴───┴───┴───┘
-      *               ┌───┐                   ┌───┐
-      *               │GUI├───┐           ┌───┤Alt│
-      *               └───┤   ├───┐   ┌───┤   ├───┘
-      *                   └───┤BSP│   │Ent├───┘
-      *                       └───┘   └───┘
-      */
     [_COLEMAK] = LAYOUT_split_3x6_3(
          KC_ESC,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_B,                          KC_J,    KC_L,    KC_U,    KC_Y,  NO_DQUO, NO_AE,
          KC_TAB,  KC_A,    KC_R,    KC_S,    KC_T,    KC_G,                          KC_M,    KC_N,    KC_E,    KC_I,     KC_O, NO_OSTR,
         KC_LSFT,  KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,                          KC_K,    KC_H, NO_COMM,  NO_DOT,  NO_SLSH, NO_ARNG,
+                                            MO_NAV, SPC_NSYM, BSP_MODS,       OSM_SFT, ENT_NSYM, MO_FUN
+    ),
+
+    [_QWERTY] = LAYOUT_split_3x6_3(
+        KC_ESC,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                               KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    NO_ARNG,
+        KC_TAB,  KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                               KC_H,    KC_J,    KC_K,    KC_L,    NO_OSTR, NO_AE,
+        KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                               KC_N,    KC_M,    NO_COMM, NO_DOT,  NO_SLSH, NO_DQUO,
                                             MO_NAV, SPC_NSYM, BSP_MODS,       OSM_SFT, ENT_NSYM, MO_FUN
     ),
 
