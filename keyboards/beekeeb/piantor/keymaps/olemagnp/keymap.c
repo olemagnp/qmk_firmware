@@ -10,7 +10,9 @@
 #define MO_NAV MO(_NAV)
 #define MO_FUN MO(_FUN)
 #define SPC_NSYM LT(_NUM_SYM, KC_SPC)
+#define SPC_NS_M LT(_NM_SM_M, KC_SPC)
 #define ENT_NSYM LT(_NUM_SYM, KC_ENT)
+#define ENT_NS_M LT(_NM_SM_M, KC_ENT)
 #define BSP_MODS LT(_MODS, KC_BSPC)
 
 #define OSM_GUI OSM(MOD_LGUI)
@@ -23,6 +25,23 @@
 #define KC_CUT LCTL(KC_X)
 #define KC_UNDO LCTL(KC_Z)
 
+#define MC_LCBR LOPT(LSFT(KC_8))
+#define MC_RCBR LOPT(LSFT(KC_9))
+#define MC_PIPE LOPT(KC_7)
+#define MC_AT KC_BSLS
+#define MC_DLR LSFT(KC_4)
+
+enum layers {
+    _COLEMAK,
+    _QWERTY,
+    _MAC_MOD,
+    _NUM_SYM,
+    _NM_SM_M, // Mac mode num/sym layer
+    _NAV,
+    _FUN,
+    _MODS,
+};
+
 typedef union {
     uint32_t raw;
     struct {
@@ -31,19 +50,20 @@ typedef union {
 } user_config_t;
 user_config_t user_config;
 
+void update_thumb_state(void) {
+    if (user_config.mac_mode) {
+        layer_on(_MAC_MOD);
+    } else {
+        layer_off(_MAC_MOD);
+    }
+}
+
 void keyboard_post_init_user(void) {
     // Read user config from EEPROM
     user_config.raw = eeconfig_read_user();
+    update_thumb_state();
 }
 
-enum layers {
-    _COLEMAK,
-    _QWERTY,
-    _NUM_SYM,
-    _NAV,
-    _FUN,
-    _MODS,
-};
 
 const key_override_t slash_override = ko_make_basic(MOD_MASK_SHIFT, NO_SLSH, NO_BSLS);
 const key_override_t quot_override = ko_make_basic(MOD_MASK_SHIFT, NO_DQUO, NO_QUOT);
@@ -94,6 +114,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (record->event.pressed) {
                 user_config.mac_mode ^= 1;
                 eeconfig_update_user(user_config.raw);
+                update_thumb_state();
             }
         return false;
     }
@@ -116,10 +137,24 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                             MO_NAV, SPC_NSYM, BSP_MODS,       OSM_SFT, ENT_NSYM, MO_FUN
     ),
 
+    [_MAC_MOD] = LAYOUT_split_3x6_3(
+        _______, _______, _______, _______, _______, _______,                        _______, _______, _______, _______, _______, _______,
+        _______, _______, _______, _______, _______, _______,                        _______, _______, _______, _______, _______, _______,
+        _______, _______, _______, _______, _______, _______,                        _______, _______, _______, _______, _______, _______,
+                                            _______, SPC_NS_M, _______,      _______, ENT_NS_M, _______
+    ),
+
     [_NUM_SYM] = LAYOUT_split_3x6_3(
         NO_CIRC, NO_EXLM, NO_QUES, NO_LBRC, NO_RBRC,   NO_AT,                        NO_ASTR, KC_7, KC_8, KC_9, NO_SLSH,  NO_DLR,
         NO_AMPR, NO_LABK, NO_RABK, NO_LPRN, NO_RPRN, NO_PIPE,                        NO_EQL,  KC_4, KC_5, KC_6, NO_MINS, NO_PERC,
         _______, NO_GRV,  NO_TILD, NO_LCBR, NO_RCBR, NO_HASH,                        KC_0,    KC_1, KC_2, KC_3, NO_PLUS, _______,
+                                            _______, _______, _______,      _______, _______, _______
+    ),
+
+    [_NM_SM_M] = LAYOUT_split_3x6_3(
+        NO_CIRC, NO_EXLM, NO_QUES, NO_LBRC, NO_RBRC,   MC_AT,                        NO_ASTR, KC_7, KC_8, KC_9, NO_SLSH,  MC_DLR,
+        NO_AMPR, NO_LABK, NO_RABK, NO_LPRN, NO_RPRN, MC_PIPE,                        NO_EQL,  KC_4, KC_5, KC_6, NO_MINS, NO_PERC,
+        _______, NO_GRV,  NO_TILD, MC_LCBR, MC_RCBR, NO_HASH,                        KC_0,    KC_1, KC_2, KC_3, NO_PLUS, _______,
                                             _______, _______, _______,      _______, _______, _______
     ),
 
