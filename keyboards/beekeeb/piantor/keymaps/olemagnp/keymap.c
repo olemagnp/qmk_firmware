@@ -222,7 +222,38 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 eeconfig_update_user(eep_config.raw);
                 update_mac_mode();
             }
-        return false;
+            return false;
+        case MD_RABK:
+            if (record->tap.count && record->event.pressed) {
+                tap_code16(NO_RABK);
+                return false;
+            }
+            break;
+        case MD_LPRN:
+            if (record->tap.count && record->event.pressed) {
+                tap_code16(NO_LPRN);
+                return false;
+            }
+            break;
+        case MD_RPRN:
+            if (record->tap.count && record->event.pressed) {
+                tap_code16(NO_RPRN);
+                return false;
+            }
+            break;
+        case MD_EQL:
+            if (record->tap.count && record->event.pressed) {
+                tap_code16(NO_EQL);
+                return false;
+            }
+            break;
+        // TMUX
+        // Note missing break in first case
+        case TMX_RCB:
+            if (record->tap.count && record->event.pressed) {
+                tap_code16(NO_RCBR);
+                return false;
+            }
         case TMUX_D:
         case TMUX_H:
         case TMX_DEL:
