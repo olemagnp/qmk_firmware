@@ -14,7 +14,7 @@
 #define USB_VBUS_PIN GP29
 
 // Mod-tap settings
-#define TAPPING_TERM 220 // Maximum time for a tap (vs hold)
+#define TAPPING_TERM 250 // Maximum time for a tap (vs hold)
 #define QUICK_TAP_TERM 100 // Time to re-hold mod-tap key for repeat (vs mod-activation)
 
 // Oneshot settings
