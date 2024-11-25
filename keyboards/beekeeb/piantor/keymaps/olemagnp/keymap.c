@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include <stdlib.h>
+#include "keycodes.h"
 #include "quantum_keycodes.h"
 #include QMK_KEYBOARD_H
 #include "keymap_norwegian.h"
@@ -9,10 +10,10 @@
 
 #define MO_FUN MO(_FUN)
 #define ESC_NAV LT(_NAV, KC_ESC)
-#define SPC_NSYM LT(_NUM_SYM, KC_SPC)
-#define SPC_NS_M LT(_NM_SM_M, KC_SPC)
-#define ENT_NSYM LT(_NUM_SYM, KC_ENT)
-#define ENT_NS_M LT(_NM_SM_M, KC_ENT)
+#define SPC_NSYM LT(_SYM, KC_SPC)
+#define SPC_NS_M LT(_SYM_MC, KC_SPC)
+#define ENT_NSYM LT(_SYM, KC_ENT)
+#define ENT_NS_M LT(_SYM_MC, KC_ENT)
 #define BSP_NUM LT(_NUM, KC_BSPC)
 
 
@@ -80,6 +81,11 @@
 #define MTMX_RC LT(0, MC_RCBR)
 #define TMUX_1  LT(0, KC_1)
 
+#define CL_H LCTL(KC_H)
+#define CL_J LCTL(KC_J)
+#define CL_K LCTL(KC_K)
+#define CL_L LCTL(KC_L)
+
 #define ko_make_basic_mac(mod_mask, trigger_, replacement_) \
     ((const key_override_t){                            \
         .trigger_mods       = (mod_mask),                 \
@@ -118,8 +124,8 @@
 enum layers {
     _COLEMAK,
     _MAC_MOD,
-    _NUM_SYM,
-    _NM_SM_M, // Mac mode num/sym layer
+    _SYM,
+    _SYM_MC, // Mac mode num/sym layer
     _NUM,
     _NAV,
     _FUN
@@ -168,8 +174,8 @@ void keyboard_post_init_user(void) {
 
 const key_override_t slash_mac = ko_make_basic_mac(MOD_MASK_SHIFT, NO_SLSH, MC_BSLS);
 const key_override_t slash_win = ko_make_basic_win(MOD_MASK_SHIFT, NO_SLSH, NO_BSLS);
-const key_override_t quot_win = ko_make_basic_win(MOD_MASK_SHIFT, NO_DQUO, NO_QUOT);
-const key_override_t quot_mac = ko_make_basic_mac(MOD_MASK_SHIFT, NO_DQUO, NO_PIPE);
+const key_override_t quot_win = ko_make_basic_win(MOD_MASK_SHIFT, NO_QUOT, NO_DQUO);
+const key_override_t quot_mac = ko_make_basic_mac(MOD_MASK_SHIFT, NO_PIPE, NO_DQUO);
 
 const key_override_t *key_overrides[] =  {
     &slash_mac,
@@ -327,7 +333,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 // Using CAGS-home-row-mods
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //    ┌──────┬───────┬───────┬─────────┬──────────┬─────────┐   ┌─────────┬──────────┬─────────┬────────┬─────────┬─────────┐
-//    │ esc  │   q   │   w   │    f    │    p     │    b    │   │    j    │    l     │    u    │   y    │ NO_DQUO │  NO_AE  │
+//    │ esc  │   q   │   w   │    f    │    p     │    b    │   │    j    │    l     │    u    │   y    │ NO_QUOT │  NO_AE  │
 //    ├──────┼───────┼───────┼─────────┼──────────┼─────────┤   ├─────────┼──────────┼─────────┼────────┼─────────┼─────────┤
 //    │ tab  │ SFT_A │ ALT_R │  GUI_S  │  CTRL_T  │  HYP_G  │   │  MEH_M  │  CTL_N   │  GUI_E  │ ALT_I  │  SFT_O  │ NO_OSTR │
 //    ├──────┼───────┼───────┼─────────┼──────────┼─────────┤   ├─────────┼──────────┼─────────┼────────┼─────────┼─────────┤
@@ -336,7 +342,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //                           │ ESC_NAV │ SPC_NSYM │ BSP_NUM │   │ OSM_SFT │ ENT_NSYM │ MO_FUN  │
 //                           └─────────┴──────────┴─────────┘   └─────────┴──────────┴─────────┘
 [_COLEMAK] = LAYOUT_split_3x6_3(
-  KC_ESC  , KC_Q  , KC_W  , KC_F    , KC_P     , KC_B    ,     KC_J    , KC_L     , KC_U    , KC_Y   , NO_DQUO , NO_AE  ,
+  KC_ESC  , KC_Q  , KC_W  , KC_F    , KC_P     , KC_B    ,     KC_J    , KC_L     , KC_U    , KC_Y   , NO_QUOT , NO_AE  ,
   KC_TAB  , SFT_A , ALT_R , GUI_S   , CTRL_T   , HYP_G   ,     MEH_M   , CTL_N    , GUI_E   , ALT_I  , SFT_O   , NO_OSTR,
   KC_LSFT , KC_Z  , KC_X  , KC_C    , TMUX_D   , KC_V    ,     KC_K    , TMUX_H   , NO_COMM , NO_DOT , NO_SLSH , NO_ARNG,
                             ESC_NAV , SPC_NSYM , BSP_NUM ,     OSM_SFT , ENT_NSYM , MO_FUN
@@ -367,7 +373,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //    └─────┴─────────┴──────────┼─────────┼─────────┼─────────┤   ├─────────┼─────────┼─────────┼─────────┴─────────┴─────┘
 //                               │         │         │         │   │         │         │         │
 //                               └─────────┴─────────┴─────────┘   └─────────┴─────────┴─────────┘
-[_NUM_SYM] = LAYOUT_split_3x6_3(
+[_SYM] = LAYOUT_split_3x6_3(
   _______ , NO_EXLM , NO_QUES  , NO_LBRC , NO_RBRC , NO_AT   ,     NO_ASTR , _______ , _______ , _______ , NO_SLSH , _______,
   _______ , MD_LABK , MD_RABK  , MD_LPRN , MD_RPRN , MD_PIPE ,     MD_AMPR , CTL_EQL , MD_EXLM , MD_CIRC , MD_DLR  , _______,
   _______ , NOD_GRV , NOD_TILD , NO_LCBR , TMX_RCB , NO_HASH ,     NO_PERC , _______ , NO_UNDS , NO_MINS , NO_PLUS , _______,
@@ -383,7 +389,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //    └─────┴─────────┴──────────┼─────────┼─────────┼─────────┤   ├─────────┼─────────┼─────────┼─────────┴─────────┴─────┘
 //                               │         │         │         │   │         │         │         │
 //                               └─────────┴─────────┴─────────┘   └─────────┴─────────┴─────────┘
-[_NM_SM_M] = LAYOUT_split_3x6_3(
+[_SYM_MC] = LAYOUT_split_3x6_3(
   _______ , NO_EXLM , NO_QUES  , NO_LBRC , NO_RBRC , MC_AT   ,     NO_ASTR , _______ , _______ , _______ , NO_SLSH , _______,
   _______ , MD_LABK , MD_RABK  , MD_LPRN , MD_RPRN , MDC_PIP ,     MD_AMPR , CTL_EQL , MD_EXLM , MD_CIRC , MDC_DLR , _______,
   _______ , NOD_GRV , NOD_TILD , MC_LCBR , MTMX_RC , NO_HASH ,     NO_PERC , _______ , NO_UNDS , NO_MINS , NO_PLUS , _______,
@@ -393,16 +399,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //    ┌─────┬─────────┬──────┬──────┬────────┬─────────┐   ┌─────────┬────────┬──────┬──────┬─────────┬─────┐
 //    │     │ NO_MINS │  9   │  8   │   7    │ NO_ASTR │   │ NO_ASTR │   7    │  8   │  9   │ NO_MINS │     │
 //    ├─────┼─────────┼──────┼──────┼────────┼─────────┤   ├─────────┼────────┼──────┼──────┼─────────┼─────┤
-//    │     │  MD_0   │ MD_6 │ MD_5 │  MD_4  │ MD_EQL  │   │ MD_EQL  │  MD_4  │ MD_5 │ MD_6 │  MD_0   │     │
+//    │  ,  │  MD_0   │ MD_6 │ MD_5 │  MD_4  │ MD_EQL  │   │ MD_EQL  │  MD_4  │ MD_5 │ MD_6 │  MD_0   │  ,  │
 //    ├─────┼─────────┼──────┼──────┼────────┼─────────┤   ├─────────┼────────┼──────┼──────┼─────────┼─────┤
-//    │     │ NO_PLUS │  3   │  2   │ TMUX_1 │ NO_SLSH │   │ NO_SLSH │ TMUX_1 │  2   │  3   │ NO_PLUS │     │
+//    │  .  │ NO_PLUS │  3   │  2   │ TMUX_1 │ NO_SLSH │   │ NO_SLSH │ TMUX_1 │  2   │  3   │ NO_PLUS │  .  │
 //    └─────┴─────────┴──────┼──────┼────────┼─────────┤   ├─────────┼────────┼──────┼──────┴─────────┴─────┘
 //                           │      │        │         │   │         │        │      │
 //                           └──────┴────────┴─────────┘   └─────────┴────────┴──────┘
 [_NUM] = LAYOUT_split_3x6_3(
   _______ , NO_MINS , KC_9 , KC_8    , KC_7    , NO_ASTR ,     NO_ASTR , KC_7    , KC_8    , KC_9 , NO_MINS , _______,
-  _______ , MD_0    , MD_6 , MD_5    , MD_4    , MD_EQL  ,     MD_EQL  , MD_4    , MD_5    , MD_6 , MD_0    , _______,
-  _______ , NO_PLUS , KC_3 , KC_2    , TMUX_1  , NO_SLSH ,     NO_SLSH , TMUX_1  , KC_2    , KC_3 , NO_PLUS , _______,
+  KC_COMM , MD_0    , MD_6 , MD_5    , MD_4    , MD_EQL  ,     MD_EQL  , MD_4    , MD_5    , MD_6 , MD_0    , KC_COMM,
+  KC_DOT  , NO_PLUS , KC_3 , KC_2    , TMUX_1  , NO_SLSH ,     NO_SLSH , TMUX_1  , KC_2    , KC_3 , NO_PLUS , KC_DOT ,
                              _______ , _______ , _______ ,     _______ , _______ , _______
 ),
 
@@ -411,29 +417,29 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //    ├─────────┼──────────┼─────────────┼─────────┼─────────┼─────┤   ├─────┼─────────┼─────────┼───────┼─────────┼─────┤
 //    │ ALT_TAB │ MD_HOME  │   MD_END    │ MD_PGUP │ MD_DOWN │     │   │     │ MD_LEFT │ MD_DOWN │ MD_UP │ MD_RGHT │     │
 //    ├─────────┼──────────┼─────────────┼─────────┼─────────┼─────┤   ├─────┼─────────┼─────────┼───────┼─────────┼─────┤
-//    │         │ www_back │ www_forward │   ins   │ TMX_DEL │     │   │     │         │         │       │         │     │
+//    │         │ www_back │ www_forward │   ins   │ TMX_DEL │     │   │     │  CL_H   │  CL_J   │ CL_K  │  CL_L   │     │
 //    └─────────┴──────────┴─────────────┼─────────┼─────────┼─────┤   ├─────┼─────────┼─────────┼───────┴─────────┴─────┘
 //                                       │         │         │     │   │     │         │         │
 //                                       └─────────┴─────────┴─────┘   └─────┴─────────┴─────────┘
 [_NAV] = LAYOUT_split_3x6_3(
   _______ , _______ , _______ , _______ , _______ , _______ ,     _______ , _______ , _______ , _______ , _______ , _______,
   ALT_TAB , MD_HOME , MD_END  , MD_PGUP , MD_DOWN , _______ ,     _______ , MD_LEFT , MD_DOWN , MD_UP   , MD_RGHT , _______,
-  _______ , KC_WBAK , KC_WFWD , KC_INS  , TMX_DEL , _______ ,     _______ , _______ , _______ , _______ , _______ , _______,
+  _______ , KC_WBAK , KC_WFWD , KC_INS  , TMX_DEL , _______ ,     _______ , CL_H    , CL_J    , CL_K    , CL_L    , _______,
                                 _______ , _______ , _______ ,     _______ , _______ , _______
 ),
 
-//    ┌─────┬──────┬─────┬─────┬────────┬──────┐   ┌─────┬─────┬─────┬────┬─────┬─────────┐
-//    │     │ bspc │     │     │  vold  │ volu │   │     │ f7  │ f8  │ f9 │ f12 │  DT_UP  │
-//    ├─────┼──────┼─────┼─────┼────────┼──────┤   ├─────┼─────┼─────┼────┼─────┼─────────┤
-//    │     │      │     │     │        │      │   │     │ f4  │ f5  │ f6 │ f11 │ DT_PRNT │
-//    ├─────┼──────┼─────┼─────┼────────┼──────┤   ├─────┼─────┼─────┼────┼─────┼─────────┤
-//    │     │      │     │     │ QK_REP │      │   │     │ f1  │ f2  │ f3 │ f10 │ DT_DOWN │
-//    └─────┴──────┴─────┼─────┼────────┼──────┤   ├─────┼─────┼─────┼────┴─────┴─────────┘
-//                       │     │        │      │   │     │     │     │
-//                       └─────┴────────┴──────┘   └─────┴─────┴─────┘
+//    ┌─────┬──────┬──────┬──────┬────────┬──────┐   ┌─────┬─────┬─────┬────┬─────┬─────────┐
+//    │     │ bRID │ bRIU │ mute │  vold  │ volu │   │     │ f7  │ f8  │ f9 │ f12 │  DT_UP  │
+//    ├─────┼──────┼──────┼──────┼────────┼──────┤   ├─────┼─────┼─────┼────┼─────┼─────────┤
+//    │     │ del  │      │ mprv │  mply  │ mnxt │   │     │ f4  │ f5  │ f6 │ f11 │ DT_PRNT │
+//    ├─────┼──────┼──────┼──────┼────────┼──────┤   ├─────┼─────┼─────┼────┼─────┼─────────┤
+//    │     │      │      │      │ QK_REP │      │   │     │ f1  │ f2  │ f3 │ f10 │ DT_DOWN │
+//    └─────┴──────┴──────┼──────┼────────┼──────┤   ├─────┼─────┼─────┼────┴─────┴─────────┘
+//                        │      │        │      │   │     │     │     │
+//                        └──────┴────────┴──────┘   └─────┴─────┴─────┘
 [_FUN] = LAYOUT_split_3x6_3(
-  _______ , KC_BSPC , _______ , _______ , KC_VOLD , KC_VOLU ,     _______ , KC_F7   , KC_F8   , KC_F9 , KC_F12 , DT_UP  ,
-  _______ , _______ , _______ , _______ , _______ , _______ ,     _______ , KC_F4   , KC_F5   , KC_F6 , KC_F11 , DT_PRNT,
+  _______ , KC_BRID , KC_BRIU , KC_MUTE , KC_VOLD , KC_VOLU ,     _______ , KC_F7   , KC_F8   , KC_F9 , KC_F12 , DT_UP  ,
+  _______ , KC_DEL  , _______ , KC_MPRV , KC_MPLY , KC_MNXT ,     _______ , KC_F4   , KC_F5   , KC_F6 , KC_F11 , DT_PRNT,
   _______ , _______ , _______ , _______ , QK_REP  , _______ ,     _______ , KC_F1   , KC_F2   , KC_F3 , KC_F10 , DT_DOWN,
                                 _______ , _______ , _______ ,     _______ , _______ , _______
 )
